@@ -5,128 +5,70 @@
     string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\WeddingDB.mdf;Integrated Security=True";
     string provider = "System.Data.SqlClient";
 
-    Database db = Database.OpenConnectionString(connectionString, provider);
-
-    var Item = db.Query("SELECT Id,Item,Price,Bought FROM List");
-    var grid = new WebGrid(Item);
-
-
 
     //variable
-    string displayvalue = "";
     string delete = "";
-    int change=0;
+    string AddButton = "";
     string AddItem = "";
     float Price = 0;
-    int AmountOfSlots = 0;
-    int i=0;
-    bool Addcol;
     var temp12 = Request.QueryString["temp12"];
+    int code = 0;
+
+    if (Session["ID"] != null)
+    {
+        code = Convert.ToInt32(Session["ID"]);
+    }
+    else if(Session["ID"] == null)
+    {
+        Response.Redirect("Index.cshtml");
+    }
+
+
+    Database db = Database.OpenConnectionString(connectionString, provider);
+    var Item = db.Query("SELECT Id,Item,Price,Bought FROM List where UniqueCode = @0", code);
+    var grid = new WebGrid(Item);
 
     if (IsPost)
     {
-        //retrieve values
-        displayvalue = Request.Form["Up"];//gets value from button clicked
-        delete = Request.Form["Delete"];
-        AddItem = Request.Form["Item"];
-        Price = Request.Form["Price"].AsFloat();
-        change = displayvalue.AsInt();
-        AmountOfSlots = Request.Form["Slots"].AsInt();
-        Addcol = Request.Form["col"].AsBool();
+        try {
+            //retrieve values
+            delete = Request.Form["Delete"];
+            AddButton = Request.Form["Add"];
+            AddItem = Request.Form["Item"];
+            Price = Request.Form["Price"].AsFloat();
 
-        if(Addcol == true)
-        {
-            while (AmountOfSlots > i)
+
+
+
+            //add
+            if (AddButton == "Add")
             {
-                i++;
-
-                var temporarydata = db.QueryValue("INSERT INTO List (Item) VALUES(@0)", i);
-
-            }
-            var RemoveTemporarydata = db.Query("UPDATE List SET Item = null,Price = null");
-            var DeleteExtra = db.Query("DELETE FROM List WHERE Id >(@0)", AmountOfSlots);
-            Response.Redirect("~/List.cshtml");
-            i = 0;
-        }
-
-
-        //switch
-        if (displayvalue != null)//checks that value recieved is null
-        {
-
-
-
-
-
-            //takes to string id and chenges it to an int for calculations
-
-
-            int temp = change; //save original position of selected item
-            var CopyToTemp1 = db.QueryValue("UPDATE List SET TemporaryHold = Item,TemporaryHoldPrice = Price WHERE Id = (@0)", change);//copies item from col 1 to col 2
-            change = change-1;//previously selected number (id) -1 to get next number to move item to
-            var CopyToTemp2 = db.QueryValue("UPDATE List SET TemporaryHold = Item,TemporaryHoldPrice = Price WHERE Id = (@0)", change );//copies the item from col 1 to col 2 where the id matched the new number previously calculated
-
-            var checkIfTop = db.QueryValue("SELECT Item FROM List WHERE Id = (@0)",change);
-            if (checkIfTop is string)//if it isnt a string its a dbnull value. this is a simple way to check
-            {
-
-                var MoveItem = db.QueryValue("SELECT Item FROM List WHERE Id=(@0)", temp);//puts the selected item from col 1 into a string named: moveitem where the id matched the originally selected item (temp)
-                var MovePriceUp = db.QueryValue("SELECT Price FROM List WHERE Id=(@0)", temp);
-
-                if (MoveItem is string)
+                var Dupes = db.QueryValue("SELECT Item FROM List WHERE Item and UniqueCode = (@0,@1)", AddItem,code);
+                if (Dupes != AddItem)
                 {
-                    var MovedUp = db.QueryValue("UPDATE List SET Item = (@0),Price = (@1) WHERE Id=(@2)", MoveItem, MovePriceUp, change);//puts item from previous string into the end destination in col 1. IE replaces the value above of the selected item with the selected item
 
-                    var MoveItem2 = db.QueryValue("SELECT TemporaryHold FROM List WHERE Id=(@0)", change); //selects from col 2 de item above the selected item and puts that into a string
-                    var MovePriceDown = db.QueryValue("SELECT TemporaryHoldPrice FROM List WHERE Id=(@0)", change);
-                    var MovedDown = db.QueryValue("UPDATE List Set Item = (@0),Price = (@1) WHERE Id=(@2)", MoveItem2, MovePriceDown, temp);//selects previous string and places this on the position of the originally selected item. IE item click is switched with the one above
 
-                    var DeleteDataFromTemp = db.Query("UPDATE List SET TemporaryHold = Null, TemporaryHoldPrice = Null");//clears the temporary holding list
+                    var insertpair = db.QueryValue("insert into list (Item, Price, UniqueCode) values (@0,@1,@2)", AddItem, Price, code); //insert data into empty space
 
+
+                    Response.Redirect("~/List.cshtml");
                 }
-
-                Response.Redirect("~/List.cshtml");//to resfresh the page and update list displayed
             }
 
-
-        }
-
-        //add
-        if (AddItem != "")
-        {
-            var Dupes = db.QueryValue("SELECT Item FROM List WHERE Item = (@0)", AddItem);
-            if (Dupes != AddItem)
+            //delete
+            if(delete == "Delete")
             {
 
-
-                    var insertpair = db.QueryValue("insert into list (Item, Price) values (@0,@1)", AddItem, Price); //insert data into empty space
+                var DeleteDataFromTemp = db.Query("DELETE FROM List WHERE Item = @0",temp12);
 
 
                 Response.Redirect("~/List.cshtml");
+
             }
+            db.Close();
         }
-
-        //delete
-        if(delete == "Delete")
-        {
-
-            var DeleteDataFromTemp = db.Query("DELETE FROM List WHERE Item = @0",temp12);
-
-
-            foreach(var num in Item)
-            {
-                i++;
-            }
-
-            //var DeleteItem = db.QueryValue("UPDATE List SET Price = null");
-
-            var DeleteItem = db.QueryValue("UPDATE List SET Item = null,Price = null WHERE Id=(@0)", i);
-            Response.Redirect("~/List.cshtml");
-            i = 0;
-        }
-
-
-    }
+        catch { };
+    };
 
 
 }
@@ -162,25 +104,30 @@
         <a href="~/List.cshtml">List</a>
     </div>
 
+    <div id="Grid">
+        @grid.GetHtml(
+
+            columns: grid.Columns(
+                grid.Column("Id"),
+                grid.Column("Item"),
+                grid.Column("Price"),
+                grid.Column(format: @<a href="~/List.cshtml?temp12=@item.Item">Select</a>)
+                 )
+             )
+
+    </div>
+
     <form method="post">
+        <label>Item:</label>
         <input type="text" name="Item" />
+        <br/>
+        <label>Price:</label>
         <input type="number" name="Price" />
+        <br/>
         <input type="submit" value="Add" name="Add" />
         <input type="submit" value="Delete" name="Delete" />
     </form>
 
-<p id="test grid"></p>
-    @grid.GetHtml(
-
-        columns: grid.Columns(
-            grid.Column("Id"),
-            grid.Column("Item"),
-            grid.Column("Price"),
-            grid.Column(format: @<a href="~/List.cshtml?temp12=@item.Item">test</a>)
-        )
-    )
-
-    @temp12
 </body>
 
 </html>
