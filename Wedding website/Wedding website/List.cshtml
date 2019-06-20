@@ -137,31 +137,7 @@
 <head>
     <title>List</title>
     <link rel="stylesheet" href="~/Stylez.css" type="text/css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-    @*<script src="https://code.jquery.com/jquery-1.12.4.js"></script>*@
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script>
-        $(function () {
-            //$("ol.example").sortable();
-
-            //$('#uItem li').click(function () {
-            //    var index = $(this).index();
-            //    var text = $(this).text();
-            //    alert('Index is: ' + index + ' and text is ' + text);
-            //});
-            $document.getElementById("demo").innerHTML = ui.item.index();
-
-            $("ol.example").sortable({
-                stop: function (e, ui) {
-                    ui.item.index();
-                }
-            });
-        });
-    </script>
-
-    @*$('ul').sortable({
- 
-    });*@
+    
     <style>
         table, th, td {
             border: 1px solid black;

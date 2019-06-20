@@ -42,38 +42,46 @@
 <head>
     <title>INDEX</title>
     <link rel="stylesheet" href="~/Stylez.css" type="text/css" />
+
+    
+
     <style>
+
         form {
             width: 200px;
             margin: 0 auto;
         }
+
+        
     </style>
 </head>
 <body>
+
+    <!-- Navbar -->
     <div class="navbar">
-
-        <a href="~/Index.cshtml">Index</a>
-
-        <a href="~/Register.cshtml">Register</a>
-
-        <a href="~/List.cshtml">List</a>
+        <a class="navbar-brand" href="~/Index.cshtml">Home</a>
+        <a class="navbar-brand" href="~/Register.cshtml">Register</a>
+        <a class="navbar-brand" href="~/List.cshtml">Wish List</a>
     </div>
 
-    <div >
+   
 
-        
-        <form method="post" >
-            <h1>Login</h1>
-            <label>Email:</label>
-            @Html.ValidationMessage("Email")<br />
-            <input type="email" name="Email" class="form-control" value="@Request.Form["Email"]" /><br />
-            <label>Password:</label>
-            @Html.ValidationMessage("Password")<br />
-            <input type="password" name="Password" class="form-control" value="@Request.Form["Password"]" /><br /><br />
-            <input type="submit" />
-        </form>
+    <div>
+        <form action="/action_page.php">
 
-        <p>@Html.Raw(Ice)</p>
+            
+                <h1>Login</h1>
+                <label>Email:</label>
+                @Html.ValidationMessage("Email")<br />
+                <input type="email" name="Email" class="form-control" value="@Request.Form["Email"]" /><br />
+                <label>Password:</label>
+                @Html.ValidationMessage("Password")<br />
+                <input type="password" name="Password" class="form-control" value="@Request.Form["Password"]" /><br /><br />
+                <input type="submit" />
+            </form>
+
+            <p>@Html.Raw(Ice)</p>
+            
     </div>
 </body>
 </html>
