@@ -1,0 +1,89 @@
+﻿@using WebMatrix.Data;
+@using System.Configuration;
+@using System.Data.SqlClient;
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\WeddingDB.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+
+
+    Validation.RequireField("Email", "Please fill in an email");
+    Validation.RequireField("Password", "Please fill in a password");
+    Validation.Add("Password",
+    Validator.Required("Please enter a password"),
+    Validator.StringLength(20, 6, "Must be between 6 and 20 characters")
+    );
+    Validation.Add("Password2",
+        Validator.Required("Put your password in here again"),
+        Validator.EqualsTo("Password", "Must be the same as your password")
+        );
+
+    var Email = Request.Form["Email"];
+    var Password = Request.Form["Password"];
+    string EmailE = "";
+
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            Database db = Database.OpenConnectionString(connectionString, provider);
+            var CheckEmail = db.QuerySingle("SELECT Email FROM Account WHERE Email = (@0)", Email);
+            var CheckPassword = db.QueryValue("SELECT Password FROM Account WHERE Email = (@0)", Email);
+
+            if (CheckEmail == null)
+            {
+                string Hpassword = Crypto.HashPassword(Password);
+
+                string insertcommand = "INSERT INTO Account (Email, Password) VALUES(@0, @1)";
+                db.Execute(insertcommand,Email,Hpassword);
+
+                Response.Redirect("~/Index.cshtml");
+
+            }
+            else
+            {
+                EmailE = "That Email is already in use";
+            }
+            db.Close();
+        }
+
+    }
+
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <link rel="stylesheet" href="~/Stylez.css" type="text/css" />
+    <style>
+        form {
+            width: 200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+
+        <a href="~/Index.cshtml">Index</a>
+
+        <a href="~/Register.cshtml">Register</a>
+
+        <a href="~/List.cshtml">List</a>
+    </div>
+
+    <form method="post">
+        @Html.ValidationMessage("Email")@Html.Raw(EmailE)<br />
+        <label>Please enter your email here.</label><br />
+        <input type="email" name="Email" placeholder="Email" value="@Request.Form["Email"]" required /><br />
+        @Html.ValidationMessage("Password")<br />
+        <label>Enter your password here</label><br />
+        <input type="password" name="Password" value="@Request.Form["Password"]" required /><br />
+        @Html.ValidationMessage("Password2")<br />
+        <label>Please Repeat your password</label><br />
+        <input type="password" name="Password2" value="@Request.Form["Password2"]" required /><br />
+        <input type="submit" />
+    </form>
+
+</body>
+</html>

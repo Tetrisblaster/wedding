@@ -1,0 +1,79 @@
+﻿@using WebMatrix.Data;
+@using System.Configuration;
+@using System.Data.SqlClient;
+@{
+    string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\WeddingDB.mdf;Integrated Security=True";
+    string provider = "System.Data.SqlClient";
+
+
+    Validation.RequireField("Email","Please fill in an email");
+    Validation.RequireField("Password","Please fill in a password");
+
+    var Email = Request.Form["Email"];
+    var Password = Request.Form["Password"];
+    string Ice = "";
+
+    if (IsPost)
+    {
+        if (Validation.IsValid())
+        {
+            Database db = Database.OpenConnectionString(connectionString, provider);
+            var CheckEmail = db.QuerySingle("SELECT Email FROM Account WHERE Email = (@0)", Email);
+            var CheckPassword = db.QueryValue("SELECT Password FROM Account WHERE Email = (@0)", Email);
+
+            if (CheckEmail!=null)
+            {
+                if (Crypto.VerifyHashedPassword(CheckPassword, Password))
+                {
+                    Session[""] = Request.Form["Email"];
+                    Response.Redirect("~/List.cshtml");
+                }
+
+            }
+            db.Close();
+        }
+
+    }
+
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>INDEX</title>
+    <link rel="stylesheet" href="~/Stylez.css" type="text/css" />
+    <style>
+        form {
+            width: 200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+
+        <a href="~/Index.cshtml">Index</a>
+
+        <a href="~/Register.cshtml">Register</a>
+
+        <a href="~/List.cshtml">List</a>
+    </div>
+
+    <div >
+
+        
+        <form method="post" >
+            <h1>Login</h1>
+            <label>Email:</label>
+            @Html.ValidationMessage("Email")<br />
+            <input type="email" name="Email" class="form-control" value="@Request.Form["Email"]" /><br />
+            <label>Password:</label>
+            @Html.ValidationMessage("Password")<br />
+            <input type="password" name="Password" class="form-control" value="@Request.Form["Password"]" /><br /><br />
+            <input type="submit" />
+        </form>
+
+        <p>@Html.Raw(Ice)</p>
+    </div>
+</body>
+</html>
