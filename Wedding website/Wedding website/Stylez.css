@@ -7,6 +7,18 @@ body {
     font-family: sans-serif;
 }
 
+/* Header/logo Title */
+.header {
+    padding: 40px;
+    text-align: center;
+    background: #1abc9c;
+    color: white;
+    background-image: url('Images/wed1.jpg');
+    background-position: center;
+    background-size:cover;
+}
+
+
 
 
 
@@ -71,7 +83,38 @@ input[type=submit] {
         background-color:darkgray;
     }
 /*---------------------------------------------------------------------------------------------------*/
-.login {
-    width: 100%;
-    text-align: center;
+.webgrid-table {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 1.2em;
+    width: 60%;
+    display: table;
+    border-collapse: separate;
+    border: solid 1px black;
+    background-color: darkslategray;
+    margin:auto;
+}
+
+    .webgrid-table td, th {
+        border: 1px solid gray;
+        padding: 3px 7px 2px;
+    }
+
+.webgrid-header {
+    background-color: rgb(122, 128, 131);
+    color: red;
+    padding-bottom: 4px;
+    padding-top: 5px;
+    text-align: left;
+}
+
+.webgrid-footer {
+}
+
+.webgrid-row-style {
+    padding: 3px 7px 2px;
+}
+
+.webgrid-alternating-row {
+    background-color: #EAF2D3;
+    padding: 3px 7px 2px;
 }

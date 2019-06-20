@@ -56,6 +56,11 @@
     </style>
 </head>
 <body>
+    
+    <div class="header">
+        <h1>Bride Wish Inc</h1>
+        <p>Make your wishes clear</p>
+    </div>
 
     <!-- Navbar -->
     <div class="navbar">
@@ -64,24 +69,29 @@
         <a class="navbar-brand" href="~/List.cshtml">Wish List</a>
     </div>
 
-   
 
-    <div>
-        <form action="/action_page.php">
 
-            
-                <h1>Login</h1>
-                <label>Email:</label>
-                @Html.ValidationMessage("Email")<br />
-                <input type="email" name="Email" class="form-control" value="@Request.Form["Email"]" /><br />
-                <label>Password:</label>
-                @Html.ValidationMessage("Password")<br />
-                <input type="password" name="Password" class="form-control" value="@Request.Form["Password"]" /><br /><br />
-                <input type="submit" />
-            </form>
+    <div class="main">
+        <form>
 
-            <p>@Html.Raw(Ice)</p>
-            
+
+            <h1>Login</h1>
+            <label>Email:</label>
+            @Html.ValidationMessage("Email")<br />
+            <input type="email" name="Email" class="form-control" placeholder="Email" value="@Request.Form["Email"]" /><br />
+            <label>Password:</label>
+            @Html.ValidationMessage("Password")<br />
+            <input type="password" name="Password" class="form-control" placeholder="Password" value="@Request.Form["Password"]" /><br /><br />
+            <input type="submit" value="Login" />
+            <p> Or if you have already have a unique code </p>
+            <label>Code</label>
+            <input type="text" name="Code" /><br />
+            <input type="submit" value="Go"/>
+
+        </form>
+
+        <p>@Html.Raw(Ice)</p>
+
     </div>
 </body>
 </html>
