@@ -98,11 +98,9 @@
             if (Dupes != AddItem)
             {
 
-                var num = db.QueryValue("SELECT Id FROM List WHERE Item IS NULL");//find FIRST empty space returns id
-                if(num is int)
-                {
-                    var insertpair = db.QueryValue("UPDATE List SET Item = (@0),Price = (@1) WHERE Id = (@2)", AddItem, Price, num); //insert data into empty space
-                }
+
+                    var insertpair = db.QueryValue("insert into list (Item, Price) values (@0,@1)", AddItem, Price); //insert data into empty space
+
 
                 Response.Redirect("~/List.cshtml");
             }
@@ -112,7 +110,7 @@
         if(delete == "Delete")
         {
 
-            var DeleteDataFromTemp = db.Query("UPDATE List SET TemporaryHold = Null, TemporaryHoldPrice = Null");
+            var DeleteDataFromTemp = db.Query("DELETE FROM List WHERE Item = @0",temp12);
 
 
             foreach(var num in Item)
@@ -137,31 +135,7 @@
 <head>
     <title>List</title>
     <link rel="stylesheet" href="~/Stylez.css" type="text/css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-    @*<script src="https://code.jquery.com/jquery-1.12.4.js"></script>*@
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script>
-        $(function () {
-            //$("ol.example").sortable();
 
-            //$('#uItem li').click(function () {
-            //    var index = $(this).index();
-            //    var text = $(this).text();
-            //    alert('Index is: ' + index + ' and text is ' + text);
-            //});
-            $document.getElementById("demo").innerHTML = ui.item.index();
-
-            $("ol.example").sortable({
-                stop: function (e, ui) {
-                    ui.item.index();
-                }
-            });
-        });
-    </script>
-
-    @*$('ul').sortable({
- 
-    });*@
     <style>
         table, th, td {
             border: 1px solid black;
@@ -189,40 +163,10 @@
     </div>
 
     <form method="post">
-        <table>
-            <tr>
-                <th></th>
-                <th>ID</th>
-                <th>ITEM</th>
-                <th>PRICE</th>
-                <th>BOUGHT</th>
-            </tr>
-            @foreach (var LItem in Item)
-            {
-
-
-                <tr>
-                    <td><button type="submit" value="@LItem.Id" name="Up">switch up</button></td>
-                    <td>@LItem.Id</td>
-                    <td>@LItem.Item</td>
-                    <td>@LItem.Price</td>
-                    <td>@LItem.Bought</td>
-                </tr>
-
-
-
-            }
-
-        </table>
-        <br />
-        <input type="text" name="Item" placeholder="Item Name" /> <input type="number" name="Price" placeholder="Price in $" min="0" step="0.01" />
-        <input type="submit" value="Add" /><br />
-
-
-        <p><input type="submit" name="Delete" value="Delete" /> Deletes highest ID item on list</p> <br />
-
-        <input type="number" name="Slots" placeholder="Enter a whole number" />
-        <button type="submit" name="col" value="true">Add amount</button>
+        <input type="text" name="Item" />
+        <input type="number" name="Price" />
+        <input type="submit" value="Add" name="Add" />
+        <input type="submit" value="Delete" name="Delete" />
     </form>
 
 <p id="test grid"></p>
