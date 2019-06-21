@@ -10,9 +10,14 @@
     string delete = "";
     string AddButton = "";
     string AddItem = "";
+    string Edit = "";
     float Price = 0;
-    var temp12 = Request.QueryString["temp12"];
+    var select = Request.QueryString["select"];
     int code = 0;
+    int Rank = Request.Form["Rank"].AsInt();
+    var Logout = "";
+    var buy = "";
+
 
     if (Session["ID"] != null)
     {
@@ -25,47 +30,78 @@
 
 
     Database db = Database.OpenConnectionString(connectionString, provider);
-    var Item = db.Query("SELECT Id,Item,Price,Bought FROM List where UniqueCode = @0", code);
+    var Item = db.Query("SELECT Rank,Item,Price,Bought FROM List where UniqueCode = @0 order by Rank", code);
     var grid = new WebGrid(Item);
 
     if (IsPost)
     {
 
-            //retrieve values
-            delete = Request.Form["Delete"];
-            AddButton = Request.Form["Add"];
-            AddItem = Request.Form["Item"];
-            Price = Request.Form["Price"].AsFloat();
+        //retrieve values
+        Edit = Request.Form["Edit"];
+        delete = Request.Form["Delete"];
+        AddButton = Request.Form["Add"];
+        AddItem = Request.Form["Item"];
+        Price = Request.Form["Price"].AsFloat();
+        Logout = Request.Form["Logout"];
+        buy = Request.Form["BUY"];
 
 
-
-
-            //add
-            if (AddButton == "Add")
-            {
-                var Dupes = db.QueryValue("SELECT Item FROM List WHERE Item = (@0) and UniqueCode = (@1)", AddItem,code);
-                if (Dupes != AddItem)
-                {
-
-
-                    var insertpair = db.QueryValue("insert into list (Item, Price, UniqueCode) values (@0,@1,@2)", AddItem, Price, code); //insert data into empty space
-
-
-                    Response.Redirect("~/List.cshtml");
-                }
-            }
-
-            //delete
-            if(delete == "Delete")
+        //add
+        if (AddButton == "Add")
+        {
+            var Dupes = db.QueryValue("SELECT Item FROM List WHERE Item = (@0) and UniqueCode = (@1)", AddItem,code);
+            if (Dupes != AddItem)
             {
 
-                var DeleteDataFromTemp = db.Query("DELETE FROM List WHERE Item = @0",temp12);
+                string bought = "Not Bought";
+                var insertpair = db.QueryValue("insert into list (Item, Price, UniqueCode, Rank, Bought) values (@0,@1,@2,@3,@4)", AddItem, Price, code, Rank,bought); //insert data into empty space
 
 
                 Response.Redirect("~/List.cshtml");
-
             }
-            db.Close();
+        }
+
+        //delete
+        if(delete == "Delete")
+        {
+
+            var DeleteDataFromTemp = db.Query("DELETE FROM List WHERE Item = @0",select);
+
+
+            Response.Redirect("~/List.cshtml");
+
+        }
+
+        //Edit
+        if (Edit == "Edit")
+        {
+
+            var EditItem = db.Query("Update List set Rank = (@0) where Item = (@1) and UniqueCode = (@2)", Rank, select, code);
+
+
+            Response.Redirect("~/List.cshtml");
+
+        }
+
+        //buy
+        if(buy == "BUY")
+        {
+    
+            string bought = "Bought!";
+            var BuyItem = db.Query("Update List set Bought = (@0) where Item = (@1) and UniqueCode = (@2)", bought, select, code);
+            Response.Redirect("Index.cshtml");
+        }
+
+
+        db.Close();
+        //logout
+        if (Logout == "Logout")
+        {
+            Session["ID"] = null;
+            Response.Redirect("Index.cshtml");
+        }
+
+
 
     };
 
@@ -108,50 +144,68 @@
    
 <body>
     <div class="navbar">
-
+        
+        <form method="post">
         <a href="~/Index.cshtml">Index</a>
 
         <a href="~/Register.cshtml">Register</a>
 
         <a href="~/List.cshtml">List</a>
 
-        <input type="submit" value="Logout" />
-
+        <input type="submit" value="Logout" name="Logout"/>
+        </form>
+        
     </div>
     <br />
     <div class="main">
-        <form method="post">
-            <label>Item</label>
-            <input type="text" name="Item" />
-            <label>Price</label>
-            <input type="number" name="Price" />
-            <input type="submit" value="Add" name="Add" />
-            <input type="submit" value="Delete" name="Delete" />
-        </form>
-        <br />
-        
+
         <div id="gridContent" style=" padding:20px; ">
 
-                @grid.GetHtml(
-               tableStyle: "webgrid-table",
-        headerStyle: "webgrid-header",
-        footerStyle: "webgrid-footer",
-        alternatingRowStyle: "webgrid-alternating-row",
-        selectedRowStyle: "webgrid-selected-row",
-        rowStyle: "webgrid-row-style",
-        mode: WebGridPagerModes.All,
+            @grid.GetHtml(
+           tableStyle: "webgrid-table",
+    headerStyle: "webgrid-header",
+    footerStyle: "webgrid-footer",
+    alternatingRowStyle: "webgrid-alternating-row",
+    selectedRowStyle: "webgrid-selected-row",
+    rowStyle: "webgrid-row-style",
+    mode: WebGridPagerModes.All,
 
-                    columns: grid.Columns(
-                        grid.Column("Id"),
-                        grid.Column("Item"),
-                        grid.Column("Price"),
-                        grid.Column(format: @<a href="~/List.cshtml?temp12=@item.Item">Select</a>)
-                                     )
-                                 )
+                columns: grid.Columns(
+                    grid.Column("Rank"),
+                    grid.Column("Item"),
+                    grid.Column("Price"),
+                    grid.Column("Bought"),
+                    grid.Column(format: @<a href="~/List.cshtml?select=@item.Item">Select</a>)
+                                       )
+                            )
 
-            
-            </div>
         </div>
+
+        <br />
+        <form method="post">
+            <label>List code:</label>
+            <br />
+            @Session["ID"]
+            <br/>
+            @if(Session["Email"] != null)
+            {
+                <label>Rank</label>
+                <input type="number" name="Rank" />
+                <label>Item</label>
+                <input type="text" name="Item" />
+                <label>Price</label>
+                <input type="number" name="Price" />
+                <input type="submit" value="Add" name="Add" />
+                <input type="submit" value="Delete" name="Delete" />
+                <input type="submit" value="Edit" name="Edit" />
+            }
+        </form>
+
+        <form method="post">
+            <input type="submit" value="BUY" name="Buy" />
+
+        </form>
+    </div>
 </body>
 
 

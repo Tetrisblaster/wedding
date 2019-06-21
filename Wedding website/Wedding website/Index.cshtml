@@ -13,11 +13,12 @@
     var Password = "";
     var Ice = "";
     var code = 0;
+    var SearchCode = "";
 
-    //if (Session["ID"] != null)
-    //{
-    //    Response.Redirect("List.cshtml");
-    //}
+    if (Session["ID"] != null)
+    {
+        Response.Redirect("List.cshtml");
+    }
 
     if (IsPost)
     {
@@ -36,7 +37,7 @@
                 if (Crypto.VerifyHashedPassword(CheckPassword, Password))
                 {
                     code = Ice.AsInt();
-
+                    Session["Email"] = Email;
                     Session["ID"] = code;
                     Response.Redirect("~/List.cshtml");
                 }
@@ -44,6 +45,29 @@
             }
             db.Close();
         }
+        else if(Email == null)
+        {
+            Database db = Database.OpenConnectionString(connectionString, provider);
+            SearchCode = Request.Form["Code"];
+            try
+            {
+                var CodeCheck = db.QueryValue("select UniqueCode from List where UniqueCode = (@0)", SearchCode);
+                if(CodeCheck is string)
+                {
+                    if(CodeCheck == SearchCode)
+                    {
+                        Session["Email"] = null;
+                        Session["ID"] = SearchCode;
+                        Response.Redirect("List.cshtml");
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+        }
+
 
     }
 
@@ -92,13 +116,14 @@
             @Html.ValidationMessage("Password")<br />
             <input type="password" name="Password" class="form-control" placeholder="Password" value="@Request.Form["Password"]" /><br /><br />
             <input type="submit" value="Login" />
+
+        </form>
+        <form method="post">
             <p> Or if you have already have a unique code </p>
             <label>Code</label>
             <input type="text" name="Code" /><br />
-            <input type="submit" value="Go"/>
-
+            <input type="submit" value="Go" />
         </form>
-
     </div>
 </body>
 </html>
