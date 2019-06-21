@@ -30,7 +30,7 @@
 
     if (IsPost)
     {
-        try {
+
             //retrieve values
             delete = Request.Form["Delete"];
             AddButton = Request.Form["Add"];
@@ -43,7 +43,7 @@
             //add
             if (AddButton == "Add")
             {
-                var Dupes = db.QueryValue("SELECT Item FROM List WHERE Item and UniqueCode = (@0,@1)", AddItem,code);
+                var Dupes = db.QueryValue("SELECT Item FROM List WHERE Item = (@0) and UniqueCode = (@1)", AddItem,code);
                 if (Dupes != AddItem)
                 {
 
@@ -66,8 +66,7 @@
 
             }
             db.Close();
-        }
-        catch { };
+
     };
 
 

@@ -9,8 +9,8 @@
     Validation.RequireField("Email","Please fill in an email");
     Validation.RequireField("Password","Please fill in a password");
 
-    var Email = Request.Form["Email"];
-    var Password = Request.Form["Password"];
+    var Email = "";
+    var Password = "";
     var Ice = "";
     var code = 0;
 
@@ -21,6 +21,9 @@
 
     if (IsPost)
     {
+
+        Email = Request.Form["Email"];
+        Password = Request.Form["Password"];
         if (Validation.IsValid())
         {
             Database db = Database.OpenConnectionString(connectionString, provider);
@@ -78,7 +81,7 @@
 
 
     <div class="main">
-        <form>
+        <form method="post">
 
 
             <h1>Login</h1>
