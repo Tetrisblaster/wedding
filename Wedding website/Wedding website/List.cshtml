@@ -31,41 +31,41 @@
     if (IsPost)
     {
 
-            //retrieve values
-            delete = Request.Form["Delete"];
-            AddButton = Request.Form["Add"];
-            AddItem = Request.Form["Item"];
-            Price = Request.Form["Price"].AsFloat();
+        //retrieve values
+        delete = Request.Form["Delete"];
+        AddButton = Request.Form["Add"];
+        AddItem = Request.Form["Item"];
+        Price = Request.Form["Price"].AsFloat();
 
 
 
 
-            //add
-            if (AddButton == "Add")
-            {
-                var Dupes = db.QueryValue("SELECT Item FROM List WHERE Item = (@0) and UniqueCode = (@1)", AddItem,code);
-                if (Dupes != AddItem)
-                {
-
-
-                    var insertpair = db.QueryValue("insert into list (Item, Price, UniqueCode) values (@0,@1,@2)", AddItem, Price, code); //insert data into empty space
-
-
-                    Response.Redirect("~/List.cshtml");
-                }
-            }
-
-            //delete
-            if(delete == "Delete")
+        //add
+        if (AddButton == "Add")
+        {
+            var Dupes = db.QueryValue("SELECT Item FROM List WHERE Item = (@0) and UniqueCode = (@1)", AddItem,code);
+            if (Dupes != AddItem)
             {
 
-                var DeleteDataFromTemp = db.Query("DELETE FROM List WHERE Item = @0",temp12);
+
+                var insertpair = db.QueryValue("insert into list (Item, Price, UniqueCode) values (@0,@1,@2)", AddItem, Price, code); //insert data into empty space
 
 
                 Response.Redirect("~/List.cshtml");
-
             }
-            db.Close();
+        }
+
+        //delete
+        if(delete == "Delete")
+        {
+
+            var DeleteDataFromTemp = db.Query("DELETE FROM List WHERE Item = @0",temp12);
+
+
+            Response.Redirect("~/List.cshtml");
+
+        }
+        db.Close();
 
     };
 
@@ -120,6 +120,9 @@
     </div>
     <br />
     <div class="main">
+        <h1>Unique Code</h1>
+        @Session["ID"]
+        <br />
         <form method="post">
             <label>Item</label>
             <input type="text" name="Item" />
@@ -129,29 +132,29 @@
             <input type="submit" value="Delete" name="Delete" />
         </form>
         <br />
-        
+
         <div id="gridContent" style=" padding:20px; ">
 
-                @grid.GetHtml(
-               tableStyle: "webgrid-table",
-        headerStyle: "webgrid-header",
-        footerStyle: "webgrid-footer",
-        alternatingRowStyle: "webgrid-alternating-row",
-        selectedRowStyle: "webgrid-selected-row",
-        rowStyle: "webgrid-row-style",
-        mode: WebGridPagerModes.All,
+            @grid.GetHtml(
+           tableStyle: "webgrid-table",
+    headerStyle: "webgrid-header",
+    footerStyle: "webgrid-footer",
+    alternatingRowStyle: "webgrid-alternating-row",
+    selectedRowStyle: "webgrid-selected-row",
+    rowStyle: "webgrid-row-style",
+    mode: WebGridPagerModes.All,
 
-                    columns: grid.Columns(
-                        grid.Column("Id"),
-                        grid.Column("Item"),
-                        grid.Column("Price"),
-                        grid.Column(format: @<a href="~/List.cshtml?temp12=@item.Item">Select</a>)
-                                     )
-                                 )
+                columns: grid.Columns(
+                    grid.Column("Id"),
+                    grid.Column("Item"),
+                    grid.Column("Price"),
+                    grid.Column(format: @<a href="~/List.cshtml?temp12=@item.Item">Select</a>)
+                                  )
+                              )
 
-            
-            </div>
+
         </div>
+    </div>
 </body>
 
 
