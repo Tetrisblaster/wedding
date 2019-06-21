@@ -5,6 +5,10 @@ body {
     padding: 0;
     text-align: center;
     font-family: sans-serif;
+    background-image: url('Images/2.jpg');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 /* Header/logo Title */
@@ -46,7 +50,7 @@ body {
 
 
 input[type=email], select {
-    width: 100%;
+    width: 50%;
     padding: 12px 20px;
     margin: 8px 0;
     display: inline-block;
@@ -57,7 +61,7 @@ input[type=email], select {
 }
 
 input[type=password], select {
-    width: 100%;
+    width: 50%;
     padding: 12px 20px;
     margin: 8px 0;
     display: inline-block;
@@ -68,7 +72,7 @@ input[type=password], select {
 }
 
 input[type=submit] {
-    width: 100%;
+    width: 30%;
     background-color: rgb(122, 128, 131);
     color: black;
     padding: 14px 20px;
