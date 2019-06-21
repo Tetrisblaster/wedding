@@ -11,7 +11,13 @@
 
     var Email = Request.Form["Email"];
     var Password = Request.Form["Password"];
-    string Ice = "";
+    var Ice = "";
+    var code = 0;
+
+    //if (Session["ID"] != null)
+    //{
+    //    Response.Redirect("List.cshtml");
+    //}
 
     if (IsPost)
     {
@@ -20,12 +26,15 @@
             Database db = Database.OpenConnectionString(connectionString, provider);
             var CheckEmail = db.QuerySingle("SELECT Email FROM Account WHERE Email = (@0)", Email);
             var CheckPassword = db.QueryValue("SELECT Password FROM Account WHERE Email = (@0)", Email);
+            Ice = db.QueryValue("SELECT UniqueCode FROM Account WHERE Email = (@0)",Email);
 
             if (CheckEmail!=null)
             {
                 if (Crypto.VerifyHashedPassword(CheckPassword, Password))
                 {
-                    Session[""] = Request.Form["Email"];
+                    code = Ice.AsInt();
+
+                    Session["ID"] = code;
                     Response.Redirect("~/List.cshtml");
                 }
 
@@ -86,8 +95,6 @@
             <input type="submit" value="Go"/>
 
         </form>
-
-        <p>@Html.Raw(Ice)</p>
 
     </div>
 </body>
